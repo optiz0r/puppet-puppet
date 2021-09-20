@@ -72,6 +72,10 @@
 # $environments_mode::                 Environments directory mode.
 #
 # $envs_dir::                          Directory that holds puppet environments
+#                                      Multiple paths can be specified, separated by colons.
+#                                      All listed directories will be created and attributes managed,
+#                                      but only the first listed path will be used to populate
+#                                      environments from git repo branches.
 #
 # $envs_target::                       Indicates that $envs_dir should be
 #                                      a symbolic link to this target
@@ -488,7 +492,7 @@ class puppet::server(
 
   if $config_version == undef {
     if $git_repo {
-      $config_version_cmd = "git --git-dir ${envs_dir}/\$environment/.git describe --all --long"
+      $config_version_cmd = "git --git-dir ${envs_dir.split(':')[0]}/\$environment/.git describe --all --long"
     } else {
       $config_version_cmd = undef
     }

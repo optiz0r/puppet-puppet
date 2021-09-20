@@ -241,13 +241,15 @@ class puppet::server::config inherits puppet::config {
     $ensure = 'directory'
   }
 
-  file { $puppet::server::envs_dir:
-    ensure => $ensure,
-    owner  => $puppet::server::environments_owner,
-    group  => $puppet::server::environments_group,
-    mode   => $puppet::server::environments_mode,
-    target => $puppet::server::envs_target,
-    force  => true,
+  $puppet::server::envs_dir.split(':').each |$dir| {
+    file { $dir:
+      ensure => $ensure,
+      owner  => $puppet::server::environments_owner,
+      group  => $puppet::server::environments_group,
+      mode   => $puppet::server::environments_mode,
+      target => $puppet::server::envs_target,
+      force  => true,
+    }
   }
 
   if $puppet::server::git_repo {
@@ -269,7 +271,7 @@ class puppet::server::config inherits puppet::config {
       mode    => $puppet::server::git_repo_mode,
       user    => $puppet::server::git_repo_user,
       group   => $puppet::server::git_repo_group,
-      require => File[$puppet::vardir, $puppet::server::envs_dir],
+      require => File[$puppet::vardir, $puppet::server::envs_dir.split(':')],
     }
 
     $git_branch_map = $puppet::server::git_branch_map
